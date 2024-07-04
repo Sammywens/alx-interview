@@ -4,7 +4,7 @@ A python function that choses a winner
 """
 
 
-def is_winner(x, nums):
+def isWinner(x, nums):
     def sieve(n):
         is_prime = [True] * (n + 1)
         is_prime[0] = is_prime[1] = False
