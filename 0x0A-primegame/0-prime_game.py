@@ -1,52 +1,43 @@
 #!/usr/bin/python3
-'''Prime Game
-'''
-from typing import List
+"""
+A python function that choses a winner
+"""
 
 
-def isWinner(x: int, nums: List[int]) -> str:
-    ''' This function take turns choosing a prime number
-    from the set and removing that number and its multiples from the set.
-    The player that cannot make a move loses the game
-    '''
-    def is_prime(num: int) -> bool:
-        if num <= 1:
-            return False
-        if num <= 3:
-            return True
-        if num % 2 == 0 or num % 3 == 0:
-            return False
-        i = 5
-        while i * i <= num:
-            if num % i == 0 or num % (i + 2) == 0:
-                return False
-            i += 6
-        return True
+def is_winner(x, nums):
+    def sieve(n):
+        is_prime = [True] * (n + 1)
+        is_prime[0] = is_prime[1] = False
+        p = 2
+        while p * p <= n:
+            if is_prime[p]:
+                for i in range(p * p, n + 1, p):
+                    is_prime[i] = False
+            p += 1
+        return [p for p in range(n + 1) if is_prime[p]]
 
-    def get_primes(n: int) -> List[int]:
-        primes = []
-        for i in range(2, n + 1):
-            if is_prime(i):
-                primes.append(i)
-        return primes
+    def play_game(n, primes):
+        prime_set = set(primes)
+        moves = 0
+        remaining = set(range(1, n + 1))
 
-    def can_win(n: int) -> bool:
-        primes = get_primes(n)
-        dp = [False] * (n + 1)
-        dp[0] = False
-        dp[1] = False
-        for i in range(2, n + 1):
-            for prime in primes:
-                if i - prime >= 0 and not dp[i - prime]:
-                    dp[i] = True
-                    break
-        return dp[n]
+        for prime in primes:
+            if prime in remaining:
+                moves += 1
+                multiples = set(range(prime, n + 1, prime))
+                remaining -= multiples
+
+        return "Maria" if moves % 2 == 1 else "Ben"
+
+    max_n = max(nums)
+    primes = sieve(max_n)
 
     maria_wins = 0
     ben_wins = 0
 
     for n in nums:
-        if can_win(n):
+        winner = play_game(n, primes)
+        if winner == "Maria":
             maria_wins += 1
         else:
             ben_wins += 1
