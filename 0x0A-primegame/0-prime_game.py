@@ -18,12 +18,13 @@ def sieve_of_eratosthenes(n):
     """
     primes = [True] * (n + 1)
     p = 2
-    while (p * p <= n):
+    while p * p <= n:
         if primes[p]:
             for i in range(p * p, n + 1, p):
                 primes[i] = False
         p += 1
     return [p for p in range(2, n + 1) if primes[p]]
+
 
 def simulate_game(n, primes):
     """
@@ -56,6 +57,7 @@ def simulate_game(n, primes):
     
     # The player who couldn't make a move loses, so the other player wins
     return players[1 - current_player]
+
 
 def isWinner(x, nums):
     """
@@ -90,9 +92,4 @@ def isWinner(x, nums):
     else:
         return None
 
-# Example usage
-if __name__ == "__main__":
-    x = 5
-    nums = [2, 5, 1, 4, 3]
-    print("Winner: {}".format(isWinner(x, nums)))  # Expected output is "Ben"
 
