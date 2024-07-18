@@ -1,95 +1,59 @@
 #!/usr/bin/python3
-
-"""
-Module: prime_game.py
-Description: A program to determine the winner of a game where Maria and Ben
-             play by removing primes and their multiples from a set of integers.
-"""
-
-def sieve_of_eratosthenes(n):
-    """
-    Return a list of primes up to n using the Sieve of Eratosthenes.
-
-    Args:
-    - n (int): Upper limit to find primes up to.
-
-    Returns:
-    - list: List of prime numbers up to n.
-    """
-    primes = [True] * (n + 1)
-    p = 2
-    while p * p <= n:
-        if primes[p]:
-            for i in range(p * p, n + 1, p):
-                primes[i] = False
-        p += 1
-    return [p for p in range(2, n + 1) if primes[p]]
+'''Prime Game
+'''
+from typing import List
 
 
-def simulate_game(n, primes):
-    """
-    Simulate the game and determine the winner for a single round.
+def isWinner(x: int, nums: List[int]) -> str:
+    ''' This function take turns choosing a prime number
+    from the set and removing that number and its multiples from the set.
+    The player that cannot make a move loses the game
+    '''
+    def is_prime(num: int) -> bool:
+        if num <= 1:
+            return False
+        if num <= 3:
+            return True
+        if num % 2 == 0 or num % 3 == 0:
+            return False
+        i = 5
+        while i * i <= num:
+            if num % i == 0 or num % (i + 2) == 0:
+                return False
+            i += 6
+        return True
 
-    Args:
-    - n (int): Number up to which game is played.
-    - primes (list): List of prime numbers up to n.
+    def get_primes(n: int) -> List[int]:
+        primes = []
+        for i in range(2, n + 1):
+            if is_prime(i):
+                primes.append(i)
+        return primes
 
-    Returns:
-    - str: Name of the player who wins the game ('Maria' or 'Ben').
-    """
-    game_state = [True] * (n + 1)
-    players = ["Maria", "Ben"]
-    current_player = 0  # Maria starts first
-    
-    while True:
-        move_made = False
-        for prime in primes:
-            if prime > n:
-                break
-            if game_state[prime]:
-                move_made = True
-                for multiple in range(prime, n + 1, prime):
-                    game_state[multiple] = False
-                current_player = 1 - current_player
-                break
-        if not move_made:
-            break
-    
-    # The player who couldn't make a move loses, so the other player wins
-    return players[1 - current_player]
+    def can_win(n: int) -> bool:
+        primes = get_primes(n)
+        dp = [False] * (n + 1)
+        dp[0] = False
+        dp[1] = False
+        for i in range(2, n + 1):
+            for prime in primes:
+                if i - prime >= 0 and not dp[i - prime]:
+                    dp[i] = True
+                    break
+        return dp[n]
 
-
-def isWinner(x, nums):
-    """
-    Determine who won the most rounds of the game.
-
-    Args:
-    - x (int): Number of rounds to play.
-    - nums (list): List of integers, where each integer specifies the maximum
-                   number for a round.
-
-    Returns:
-    - str or None: Name of the player who won the most rounds ('Maria' or 'Ben'),
-                   or None if it's a tie.
-    """
-    max_n = max(nums)
-    primes = sieve_of_eratosthenes(max_n)
-    
     maria_wins = 0
     ben_wins = 0
-    
+
     for n in nums:
-        winner = simulate_game(n, primes)
-        if winner == "Maria":
+        if can_win(n):
             maria_wins += 1
         else:
             ben_wins += 1
-    
+
     if maria_wins > ben_wins:
         return "Maria"
     elif ben_wins > maria_wins:
         return "Ben"
     else:
         return None
-
-
