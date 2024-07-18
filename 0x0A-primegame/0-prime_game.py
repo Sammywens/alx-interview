@@ -1,42 +1,48 @@
 #!/usr/bin/python3
-"""
-A python function that choses a winner
-"""
+def sieve_of_eratosthenes(n):
+    """Return a list of primes up to n using the Sieve of Eratosthenes."""
+    primes = [True] * (n + 1)
+    p = 2
+    while (p * p <= n):
+        if primes[p]:
+            for i in range(p * p, n + 1, p):
+                primes[i] = False
+        p += 1
+    return [p for p in range(2, n + 1) if primes[p]]
 
+def simulate_game(n, primes):
+    """Simulate the game and determine the winner for a single round."""
+    game_state = [True] * (n + 1)
+    players = ["Maria", "Ben"]
+    current_player = 0  # Maria starts first
+
+    while True:
+        move_made = False
+        for prime in primes:
+            if prime > n:
+                break
+            if game_state[prime]:
+                move_made = True
+                for multiple in range(prime, n + 1, prime):
+                    game_state[multiple] = False
+                current_player = 1 - current_player
+                break
+        if not move_made:
+            break
+
+    # The player who couldn't make a move loses, so the other player wins
+    return players[1 - current_player]
 
 def isWinner(x, nums):
-    def sieve(n):
-        is_prime = [True] * (n + 1)
-        is_prime[0] = is_prime[1] = False
-        p = 2
-        while p * p <= n:
-            if is_prime[p]:
-                for i in range(p * p, n + 1, p):
-                    is_prime[i] = False
-            p += 1
-        return [p for p in range(n + 1) if is_prime[p]]
-
-    def play_game(n, primes):
-        prime_set = set(primes)
-        moves = 0
-        remaining = set(range(1, n + 1))
-
-        for prime in primes:
-            if prime in remaining:
-                moves += 1
-                multiples = set(range(prime, n + 1, prime))
-                remaining -= multiples
-
-        return "Maria" if moves % 2 == 1 else "Ben"
-
+    """Determine who won the most rounds."""
     max_n = max(nums)
-    primes = sieve(max_n)
+    primes = sieve_of_eratosthenes(max_n)
 
     maria_wins = 0
     ben_wins = 0
 
     for n in nums:
-        winner = play_game(n, primes)
+        winner = simulate_game(n, primes)
         if winner == "Maria":
             maria_wins += 1
         else:
@@ -48,3 +54,4 @@ def isWinner(x, nums):
         return "Ben"
     else:
         return None
+
